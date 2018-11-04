@@ -3,11 +3,12 @@ extern crate rand;
 mod binary_tree;
 mod cell;
 mod grid;
+//mod sidewinder;
 
-use self::grid::Grid;
+use self::grid::{map_cells, Grid};
 
 fn main() {
-    let mut grid = Grid::new(8, 8);
-    binary_tree::binary_tree(&mut grid);
-    println!("{}", grid);
+    let empty = Grid::new(10, 10);
+    let bt = binary_tree::binary_tree(empty);
+    println!("{}", bt);
 }

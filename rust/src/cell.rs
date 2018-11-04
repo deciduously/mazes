@@ -24,6 +24,29 @@ impl Cell {
     }
   }
 
+  /// links self with target, optionally bidirectionally
+  pub fn link(&mut self, target: &mut Cell, bidi: bool) {
+    let mut linked = false;
+    // they all have 4 possible origins
+    for i in 0..4 {
+      match self.links[i] {
+        Some(_) => continue,
+        None => {
+          self.links[i] = Some(target.id);
+          if bidi {
+            target.link(self, false);
+          }
+          linked = true;
+          break;
+        }
+      }
+    }
+    if !linked {
+      // Every link was already filled - can only have 4 maximum.
+      panic!("Could not link!")
+    }
+  }
+
   ///linked is a predicate testing whether Cell is linked to target
   pub fn linked(&self, target: Option<i32>) -> bool {
     match target {

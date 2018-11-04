@@ -40,29 +40,6 @@ impl Grid {
     }
     None
   }
-
-  /// links origin cell with target, optionally bidirectionally
-  pub fn link(&mut self, origin: i32, target: i32, bidi: bool) {
-    let mut linked = false;
-    // they all have 4 possible origins
-    for i in 0..4 {
-      match self.cell_by_id(origin).unwrap().links[i] {
-        Some(_) => continue,
-        None => {
-          self.cell_by_id_mut(origin).unwrap().links[i] = Some(self.cell_by_id(target).unwrap().id);
-          if bidi {
-            self.link(target, origin, false);
-          }
-          linked = true;
-          break;
-        }
-      }
-    }
-    if !linked {
-      // Every link was already filled - can only have 4 maximum.
-      panic!("Could not link!")
-    }
-  }
 }
 
 impl fmt::Display for Grid {
@@ -142,9 +119,9 @@ fn get(grid: &Grid, row: i32, column: i32) -> Option<i32> {
 }
 
 /// takes a function to perform on each row
-fn map_rows<F>(grid: &mut Grid, step: F)
+fn map_rows<F>(grid: &mut Grid, mut step: F)
 where
-  F: Fn(&mut Vec<Cell>),
+  F: FnMut(&mut Vec<Cell>),
 {
   for row in &mut grid.grid {
     step(row);
@@ -152,9 +129,9 @@ where
 }
 
 /// takes a function to perform on each cell
-pub fn map_cells<F>(grid: &mut Grid, step: F)
+pub fn map_cells<F>(grid: &mut Grid, mut step: F)
 where
-  F: Fn(&mut Cell),
+  F: FnMut(&mut Cell),
 {
   map_rows(grid, |row| {
     for cell in row {

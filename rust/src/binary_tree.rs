@@ -1,28 +1,29 @@
 use rand::{thread_rng, Rng};
 
-use super::grid::Grid;
+use super::{cell::Cell, grid::Grid, map_cells};
 
-pub fn binary_tree(grid: &mut Grid) {
+pub fn binary_tree_step(target: &mut Grid, cell: &mut Cell) {
   let mut rng = thread_rng();
-  let mut pairs = Vec::new();
-  for row in &grid.grid {
-    for cell in row {
-      let mut neighbors = Vec::new();
-      match cell.north {
-        Some(id) => neighbors.push(id),
-        None => {}
-      };
-      match cell.east {
-        Some(id) => neighbors.push(id),
-        None => {}
-      };
-      let lucky_passage = rng.choose(&neighbors).unwrap_or(&-1);
-      pairs.push((cell.id, *lucky_passage));
-    }
+  let mut neighbors = Vec::new();
+  match cell.north {
+    Some(id) => neighbors.push(id),
+    None => {}
+  };
+  match cell.east {
+    Some(id) => neighbors.push(id),
+    None => {}
+  };
+  let lucky_passage = rng.choose(&neighbors);
+  match lucky_passage {
+    Some(id) => cell.link(target.cell_by_id_mut(*id).unwrap(), true),
+    None => {}
   }
-  for pair in &pairs {
-    if pair.1 >= 0 {
-      grid.link(pair.0, pair.1, true);
-    }
-  }
+}
+
+pub fn binary_tree(mut grid: Grid) -> Grid {
+  let mut ret = Grid::new(grid.rows, grid.columns);
+  map_cells(&mut grid, |cell: &mut Cell| {
+    binary_tree_step(&mut ret, cell)
+  });
+  ret
 }
