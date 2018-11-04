@@ -2,4 +2,4 @@
 
 WIP
 
-I'm going through Mazes for Programmers.  It's written in Ruby and I'm following along in Rust.
+I'm going through [Mazes for Programmers](http://www.mazesforprogrammers.com/).  It's written in Ruby and I'm following along in Rust.
