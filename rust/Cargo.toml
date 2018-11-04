@@ -1,0 +1,7 @@
+[package]
+authors = ["deciduously <ben@deciduously.com>"]
+edition = "2018"
+name = "mazes"
+version = "0.1.0"
+[dependencies]
+rand = "0.5"
