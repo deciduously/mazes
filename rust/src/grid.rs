@@ -43,7 +43,6 @@ impl Grid {
 
   /// links origin cell with target, optionally bidirectionally
   pub fn link(&mut self, origin: i32, target: i32, bidi: bool) {
-    println!("linking {} with {}", origin, target);
     let mut linked = false;
     // they all have 4 possible origins
     for i in 0..4 {
@@ -55,6 +54,7 @@ impl Grid {
             self.link(target, origin, false);
           }
           linked = true;
+          break;
         }
       }
     }

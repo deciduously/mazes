@@ -9,25 +9,20 @@ pub fn binary_tree(grid: &mut Grid) {
     for cell in row {
       let mut neighbors = Vec::new();
       match cell.north {
-        Some(_) => neighbors.push(cell.id),
+        Some(id) => neighbors.push(id),
         None => {}
       };
       match cell.east {
-        Some(_) => neighbors.push(cell.id),
+        Some(id) => neighbors.push(id),
         None => {}
       };
-
-      let neighbors_len = neighbors.len();
-      let high = if neighbors_len > 0 { neighbors_len } else { 1 };
-      let index = rng.gen_range(0, high);
-
-      if neighbors_len > 0 {
-        pairs.push((cell.id, grid.cell_by_id(neighbors[index]).unwrap().id));
-      }
+      let lucky_passage = rng.choose(&neighbors).unwrap_or(&-1);
+      pairs.push((cell.id, *lucky_passage));
     }
   }
-  println!("{:?}", pairs);
-  for (origin, target) in &pairs {
-    grid.link(*origin, *target, true);
+  for pair in &pairs {
+    if pair.1 >= 0 {
+      grid.link(pair.0, pair.1, true);
+    }
   }
 }
