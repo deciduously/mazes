@@ -3,13 +3,13 @@ use std::fmt;
 use super::cell::Cell;
 
 #[derive(Clone, Debug)]
-pub struct Grid {
+pub struct Grid<'a> {
   pub rows: i32,
   pub columns: i32,
-  pub grid: Vec<Vec<Cell>>,
+  pub grid: Vec<Vec<Cell<'a>>>,
 }
 
-impl Grid {
+impl<'a> Grid<'a> {
   pub fn new(rows: i32, columns: i32) -> Self {
     let ret = Self {
       rows,
@@ -19,7 +19,7 @@ impl Grid {
     configure_grid(&ret)
   }
 
-  pub fn cell_by_id<'a>(&'a self, id: i32) -> Option<&'a Cell> {
+  pub fn cell_by_id(&'a self, id: i32) -> Option<&'a Cell> {
     for row in self.grid.iter() {
       for cell in row.iter() {
         if cell.id == id {
@@ -30,7 +30,7 @@ impl Grid {
     None
   }
 
-  pub fn cell_by_id_mut<'a>(&'a mut self, id: i32) -> Option<&'a mut Cell> {
+  pub fn cell_by_id_mut(&'a mut self, id: i32) -> Option<&'a mut Cell> {
     for row in self.grid.iter_mut() {
       for cell in row.iter_mut() {
         if cell.id == id {
@@ -42,7 +42,7 @@ impl Grid {
   }
 }
 
-impl fmt::Display for Grid {
+impl<'a> fmt::Display for Grid<'a> {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut ret = String::new();
 
@@ -94,7 +94,7 @@ impl fmt::Display for Grid {
 // so here we are
 
 // initializes a prepared grid with neighbors
-fn configure_grid(grid: &Grid) -> Grid {
+fn configure_grid<'a>(grid: &Grid<'a>) -> Grid<'a> {
   let mut ret = grid.clone();
   map_cells(&mut ret, |cell: &mut Cell| {
     let row = cell.row;
@@ -141,7 +141,7 @@ where
 }
 
 /// returns a Vec<Vec<Cell>> of the given dimensions
-fn prepare_grid(rows: i32, columns: i32) -> Vec<Vec<Cell>> {
+fn prepare_grid<'a>(rows: i32, columns: i32) -> Vec<Vec<Cell<'a>>> {
   let mut ret = Vec::new();
   let mut current_id = 0;
   for i in 0..rows {

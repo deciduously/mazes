@@ -1,6 +1,6 @@
 extern crate rand;
 
-mod binary_tree;
+//mod binary_tree;
 mod cell;
 mod grid;
 //mod sidewinder;
