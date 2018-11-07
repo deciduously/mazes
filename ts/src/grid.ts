@@ -34,9 +34,14 @@ export default class Grid {
         });
     }
 
-    public draw = (cell_size = 10) => {
+    public draw = () => {
         this.context.clearRect(0, 0, this.canvasW, this.canvasH);
         const wall_color = '#000';
+
+        this.each_cell((cell) => {
+            const x1 = cell.column * this.cell_size;
+            const x2 = cell.row & this.cell_size;
+        })
     }
 
     public each_cell = (f: (cell: Cell) => void) => {
