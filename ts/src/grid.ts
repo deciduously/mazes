@@ -1,12 +1,22 @@
 import Cell from './cell';
 
 export default class Grid {
-    private readonly rows: number;
-    private readonly columns: number;
+    private readonly context: CanvasRenderingContext2D;
+    private readonly canvasW: number;
+    private readonly canvasH: number;
     private grid: Cell[][];
-    constructor(rows: number, columns: number) {
-        this.rows = rows;
-        this.columns = columns;
+    constructor(private readonly canvas: HTMLCanvasElement,
+                private readonly rows: number,
+                private readonly columns: number,
+                private readonly cell_size: number) {
+        // set up canvas
+        this.context = this.canvas.getContext('2d')!;
+        this.canvasW = (rows * cell_size) + 1;
+        this.canvasH = (columns * cell_size) + 1;
+        this.canvas.width = this.canvasW;
+        this.canvas.height = this.canvasH;
+
+        // set up grid
         this.grid = [];
         this.prepare_grid();
         this.configure_grid();
@@ -22,6 +32,11 @@ export default class Grid {
             cell.west = this.get_cell(row, col - 1);
             cell.east = this.get_cell(row, col + 1);
         });
+    }
+
+    public draw = (cell_size = 10) => {
+        this.context.clearRect(0, 0, this.canvasW, this.canvasH);
+        const wall_color = '#000';
     }
 
     public each_cell = (f: (cell: Cell) => void) => {
