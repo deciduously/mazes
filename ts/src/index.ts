@@ -1,13 +1,9 @@
-const world = 'world';
-
-export function hello(word: string = world): string {
-    return `Hello, ${world}! `;
-}
+import Grid from './grid';
 
 const main = () => {
     const app = document.querySelector('#app');
-    app.appendChild(document.createTextNode(hello()));
-    app.appendChild(document.createElement("canvas"));
+    const grid = new Grid(10, 10);
+    console.log(grid.toString());
 }
 
 main();
