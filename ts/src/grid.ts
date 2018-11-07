@@ -24,11 +24,11 @@ export default class Grid {
         });
     }
 
-    private each_cell = (f: (cell: Cell) => void) => {
+    public each_cell = (f: (cell: Cell) => void) => {
         this.each_row((row) => row.forEach((cell) => f(cell)));
     }
 
-    private each_row = (f: (row: Cell[]) => void) => {
+    public each_row = (f: (row: Cell[]) => void) => {
         this.grid.forEach((row) => f(row));
     }
 
