@@ -1,12 +1,12 @@
 import Grid from './grid';
 
-export const binaryTree = (grid: Grid): Grid => {
+export const binaryTree = (grid: Grid): void => {
     grid.each_cell((cell) => {
         let neighbors = [];
-        if (cell.north !== null) {
+        if (cell.north) {
             neighbors.push(cell.north)
         }
-        if (cell.east !== null) {
+        if (cell.east) {
             neighbors.push(cell.east)
         }
 
@@ -16,6 +16,4 @@ export const binaryTree = (grid: Grid): Grid => {
             cell.link(neighbor)
         }
     });
-
-    return grid;
 }

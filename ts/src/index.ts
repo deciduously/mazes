@@ -1,11 +1,12 @@
-import  { binaryTree } from './binary_tree';
+//import  { binaryTree } from './binary_tree';
+import { sidewinder } from './sidewinder';
 import Grid from './grid';
 
 const main = () => {
     const app = document.querySelector('#app')!;
-    const grid = new Grid(4, 4);
-    let bt = binaryTree(grid);
-    console.log(bt.toString());
+    const grid = new Grid(8, 8);
+    sidewinder(grid);
+    console.log(grid.toString());
 }
 
 main();

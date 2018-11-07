@@ -5,7 +5,7 @@ export default class Cell {
     public south: Cell | null;
     public west: Cell | null;
     public east: Cell | null;
-    private links: WeakMap<Cell, boolean>;
+    private links: Map<Cell, boolean>;
     constructor(row: number, column: number) {
         this.row = row;
         this.column = column;
@@ -13,7 +13,7 @@ export default class Cell {
         this.south = null;
         this.east = null;
         this.west = null;
-        this.links = new WeakMap();
+        this.links = new Map();
     }
 
     public contents = () => ' ';
