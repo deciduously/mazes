@@ -46,9 +46,8 @@ export default class Grid {
     });
   }
 
-  public draw = () => {
+  public draw = (wallColor = '#000') => {
     this.context.clearRect(0, 0, this.canvasW, this.canvasH);
-    const wallColor = '#000';
 
     this.eachCell((cell) => {
       // get boundaries

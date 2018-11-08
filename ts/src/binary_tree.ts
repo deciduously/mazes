@@ -3,16 +3,12 @@ import grid from './grid';
 export const binaryTree = (grid: grid): void => {
   grid.eachCell((cell) => {
     const neighbors = [];
-    if (cell.north) {
-      neighbors.push(cell.north);
-    }
-    if (cell.east) {
-      neighbors.push(cell.east);
-    }
+    if (cell.north !== null) { neighbors.push(cell.north); }
+    if (cell.east !== null) { neighbors.push(cell.east); }
 
-    const neighbor = neighbors[neighbors.length * Math.random() | 0];
-
-    if (neighbor !== undefined) {
+    if (neighbors.length > 0) {
+      const luckyNeighbor = Math.floor(Math.random() * neighbors.length);
+      const neighbor = neighbors[luckyNeighbor];
       cell.link(neighbor);
     }
   });
