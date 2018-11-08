@@ -11,15 +11,18 @@
 </head>
 
 <body>
-    <div id="controls">
-        <p>Algorithm:</p>
-        <div>
-            <button id="binarytree">New Binary Tree Maze</label>
-        </div>
-        <div>
-            <button id="sidewinder">New Sidewinder Maze</label>
-        </div>
-    </div>
+    <form>
+        <fieldset>
+            <legend>Algorithm</legend>
+
+            <input type="radio" name="algo" id="binarytree" value="binarytree" checked>
+            <label for="binarytree">Binary Tree</label>
+
+            <input type="radio" name="algo" id="sidewinder" value="sidewinder">
+            <label for="sidewinder">Sidewinder</label>
+        </fieldset>
+        <button type="submit">Draw!</button>
+    </form>
     <div id="app"></div>
     <footer><a href="https://github.com/deciduously/mazes/tree/master/ts">source</a></footer>
 </body>

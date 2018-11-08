@@ -1,5 +1,24 @@
+
 import cell from './cell';
 import grid from './grid';
+
+const sample = (list: any[]): any | null => {
+  if (list.length === 0) { return null; }
+  return list[Math.floor((Math.random() * list.length))];
+};
+
+export const binaryTree = (grid: grid): void => {
+  grid.eachCell((cell) => {
+    const neighbors = [];
+    if (cell.north !== null) { neighbors.push(cell.north); }
+    if (cell.east !== null) { neighbors.push(cell.east); }
+
+    const neighbor = sample(neighbors);
+    if (neighbor !== null) {
+      cell.link(neighbor);
+    }
+  });
+};
 
 export const sidewinder = (grid: grid): void => {
   grid.eachRow((row) => {
@@ -16,7 +35,7 @@ export const sidewinder = (grid: grid): void => {
         (!atNorthernBoundary && Math.floor(Math.random() * 2) === 0);
 
       if (shouldCloseOut) {
-        const member = run[Math.floor(Math.random() * run.length)];
+        const member = sample(run);
         if (member.north) { member.link(member.north); }
         run = [];
       } else {

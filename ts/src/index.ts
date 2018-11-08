@@ -1,13 +1,12 @@
-import { binaryTree } from './binary_tree';
-import { sidewinder } from './sidewinder';
+import { binaryTree, sidewinder } from './algo';
 import grid from './grid';
 
 // makes a new maze and draws it to a the canvas
 const drawMaze = (algo: string) => {
   // set up grid parameters
-  const gridW = 100;
-  const gridH = 100;
-  const cellSize = 10;
+  const gridW = 5;
+  const gridH = 5;
+  const cellSize = 30;
 
   // Build maze
   const maze: grid = new grid(document.querySelector('canvas')!, gridW, gridH, cellSize);
@@ -24,11 +23,14 @@ const drawMaze = (algo: string) => {
   maze.draw();
 };
 
-// set up controls
-const btButton = document.querySelector('#binarytree')!;
-btButton.addEventListener('click', _ => drawMaze('binarytree'));
-const sidewinderButton = document.querySelector('#sidewinder')!;
-sidewinderButton.addEventListener('click', _ => drawMaze('sidewinder'));
+const form = document.querySelector('form')!;
+
+form.onsubmit = () => {
+  const data = new FormData(form);
+  const algo = data.get('algo') as string;
+  drawMaze(algo);
+  return false; // prevent reload
+};
 
 const main = () => {
   // create canvas
