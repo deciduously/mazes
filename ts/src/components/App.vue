@@ -1,5 +1,6 @@
 <template>
   <app>
+    <h1>Mazes</h1>
     <form>
       <fieldset>
           <legend>Algorithm</legend>
@@ -15,10 +16,10 @@
 </template>
 
 <script lang="ts">
-import { binaryTree, sidewinder } from "./algo";
-import grid from "./grid";
+//import { binaryTree, sidewinder } from "./algo";
+import grid from "../grid";
+import Vue from "vue";
 //import component from "vue-class-component"; //not using this yet
-import vue from "vue";
 
 // makes a new maze and draws it to a the canvas
 // will be a method on the component?
@@ -57,26 +58,37 @@ import vue from "vue";
 //  return false; // prevent reload
 //};
 
-
 // main();
 
-export default class app extends vue {
-    data: function() {
+export default Vue.extend({
+  data() {
     return {
       rows: 15,
       columns: 15,
       grid_size: 20,
       color: "#000",
       algo: "binarytree"
+    };
+  },
+  computed: {
+    maze(): grid {
+      let g = new grid(
+        document.querySelector("canvas")!,
+        this.$data.rows,
+        this.$data.columns,
+        this.$data.grid_size
+      );
+      return g;
+    },
+    mazeString: function(): string {
+      return this.maze.toString();
     }
   }
-  get maze() {
-    let g = new grid(document.querySelector('canvas')!, this.$data.rows, this.$data.columns, this.$data.grid_size);
-    return g;
-  }
-
-  get mazeString(): string {
-    return this.maze().toString();
-  }
-}
+});
 </script>
+
+<style>
+h1 {
+  font-style: italic;
+}
+</style>
