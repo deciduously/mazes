@@ -9,8 +9,8 @@ export default class Grid {
     private readonly columns: number,
     public readonly cellSize: number) {
     // set up canvas
-    this.canvasW = (rows * cellSize) + 1;
-    this.canvasH = (columns * cellSize) + 1;
+    this.canvasW = (columns * cellSize) + 1;
+    this.canvasH = (rows * cellSize) + 1;
 
     // set up grid
     this.grid = [];
