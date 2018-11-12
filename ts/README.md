@@ -1,5 +1,4 @@
 # mazes-ts
-# mazes-ts
 
 A translation of some of the code in [Mazes for Programmers](http://www.mazesforprogrammers.com/) into TypeScript with some controls to play with them.
 

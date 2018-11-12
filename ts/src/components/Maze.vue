@@ -10,14 +10,15 @@
             <label for="sidewinder">Sidewinder</label>
         </fieldset>
       </form>
-      <canvas></canvas>
       <pre>{{ mazeString }}</pre>
+      <canvas v-draw-maze="maze"></canvas>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Grid from "../maze/grid";
+import { binaryTree, sidewinder } from "@/maze/algo";
 
 @Component
 export default class Maze extends Vue {
@@ -35,12 +36,19 @@ export default class Maze extends Vue {
   }
 
   get maze(): Grid {
-    let g = new Grid(
-      document.querySelector("canvas")!,
+    const g = new Grid(
       this.$data.rows,
       this.$data.columns,
       this.$data.grid_size
     );
+    switch (this.$data.algo) {
+      case sidewinder:
+        sidewinder(g);
+        break;
+      case "binarytree":
+      default:
+        binaryTree(g);
+    }
     return g;
   }
   get mazeString(): string {
