@@ -1,7 +1,7 @@
 <template>
   <div class="Maze">
-      <h1>Mazes</h1>
-      <button v-on:click="refreshMaze">Redraw</button>
+      <h1>{{ title }}</h1>
+      <button v-on:click="refreshMaze">New Maze</button>
       <input type="checkbox" id="ascii" v-model="ascii">
       <label for="checkbox">Render ASCII?</label>
       <form v-on:change="refreshMaze">
@@ -14,47 +14,56 @@
         </fieldset>
         <fieldset>
           <legend>Size</legend>
-          <input type="text" class="textbox" id="rows" v-model="rows">
-          <label for="rows">Rows</label>
-          <input type="text" class="textbox" id="columns" v-model="columns">
-          <label for="columns">Columns</label>
-          <input type="text" class="textbox" id="cellSize" v-model="cell_size">
-          <label for="cellSize">Cell Size</label>
+          <span>{{ rows }}</span>
+          <input type="range" min="2" max="200" id="rows" v-model="rows">
+          <label for="rows">Rows</label><br/>
+          <span>{{ columns }}</span>
+          <input type="range" min="2" max="200" id="columns" v-model="columns">
+          <label for="columns">Columns</label><br/>
+          <!-- broken until I fugure out how to force a redraw without tweaking any inputs
+          <span>{{ cellSize }}</span>
+          <input type="range" min="1" max="50" id="cellSize" v-model="cellSize">
+          <label for="cellSize">Cell Size</label> -->
         </fieldset>
       </form>
       <canvas v-draw-maze="currentMaze"></canvas>
       <pre v-if="ascii">{{ mazeString }}</pre>
+    <footer><a href="https://github.com/deciduously/mazes/tree/master/ts">source</a></footer>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Grid from "../maze/grid";
+import Grid from "@/maze/grid";
 import { binaryTree, sidewinder } from "@/maze/algo";
 
-@Component
+@Component({
+  directives: {
+    "draw-maze": function(canvasElement, binding) {
+      binding.value.draw(canvasElement as HTMLCanvasElement);
+    }
+  }
+})
 export default class Maze extends Vue {
   @Prop()
   private title!: string;
 
-  data() {
+  private data() {
     return {
       algo: "binarytree",
       ascii: false,
-      rows: 15,
-      columns: 15,
-      cell_size: 20,
-      currentMaze: this.maze || new Grid(15, 15, 20)
+      rows: 20,
+      columns: 20,
+      cellSize: 10,
+      currentMaze: this.maze || new Grid(20, 20, 10) // required for initial draw
     };
   }
 
-  // methods
-
-  refreshMaze(): void {
-    // force a redraw by tweaking and untweaking rows by 1
-    // this is causing the rows field to flip out and add a zero on loss of focus after a change
-    this.$data.rows += 1;
-    this.$data.rows -= 1;
+  private refreshMaze(): void {
+    // force a redraw by tweaking and untweaking cellSize by 1
+    // this is causing that to flip out and add a zero on loss of focus after a change
+    this.$data.cellSize += 1;
+    this.$data.cellSize -= 1;
     this.$data.currentMaze = this.maze;
   }
 
@@ -64,10 +73,10 @@ export default class Maze extends Vue {
     const g = new Grid(
       this.$data.rows,
       this.$data.columns,
-      this.$data.cell_size
+      this.$data.cellSize
     );
     switch (this.$data.algo) {
-      case sidewinder:
+      case "sidewinder":
         sidewinder(g);
         break;
       case "binarytree":
