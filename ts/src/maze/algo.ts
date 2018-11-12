@@ -1,13 +1,13 @@
 
-import cell from './cell';
-import grid from './grid';
+import Cell from './cell';
+import Grid from './grid';
 
 const sample = (list: any[]): any | null => {
   if (list.length === 0) { return null; }
   return list[Math.floor((Math.random() * list.length))];
 };
 
-export const binaryTree = (grid: grid): void => {
+export const binaryTree = (grid: Grid): void => {
   grid.eachCell((cell) => {
     const neighbors = [];
     if (cell.north !== null) { neighbors.push(cell.north); }
@@ -20,9 +20,9 @@ export const binaryTree = (grid: grid): void => {
   });
 };
 
-export const sidewinder = (grid: grid): void => {
+export const sidewinder = (grid: Grid): void => {
   grid.eachRow((row) => {
-    let run: cell[] = [];
+    let run: Cell[] = [];
 
     row.forEach((cell) => {
       run.push(cell);
