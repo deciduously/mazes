@@ -2,6 +2,8 @@
   <div class="Maze">
       <h1>Mazes</h1>
       <button v-on:click="refreshMaze">Redraw</button>
+      <input type="checkbox" id="ascii" v-model="ascii">
+      <label for="checkbox">Render ASCII?</label>
       <form v-on:change="refreshMaze">
         <fieldset class="algo">
             <legend>Algorithm</legend>
@@ -21,7 +23,7 @@
         </fieldset>
       </form>
       <canvas v-draw-maze="currentMaze"></canvas>
-      <pre>{{ mazeString }}</pre>
+      <pre v-if="ascii">{{ mazeString }}</pre>
   </div>
 </template>
 
@@ -38,6 +40,7 @@ export default class Maze extends Vue {
   data() {
     return {
       algo: "binarytree",
+      ascii: false,
       rows: 15,
       columns: 15,
       cell_size: 20,
@@ -49,6 +52,7 @@ export default class Maze extends Vue {
 
   refreshMaze(): void {
     // force a redraw by tweaking and untweaking rows by 1
+    // this is causing the rows field to flip out and add a zero on loss of focus after a change
     this.$data.rows += 1;
     this.$data.rows -= 1;
     this.$data.currentMaze = this.maze;
