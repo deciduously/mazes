@@ -26,7 +26,7 @@
           <label for="cellSize">Cell Size</label> -->
         </fieldset>
       </form>
-      <canvas v-draw-maze="currentMaze"></canvas>
+      <canvas v-draw-maze="maze"></canvas>
       <pre v-if="ascii">{{ mazeString }}</pre>
     <footer><a href="https://github.com/deciduously/mazes/tree/master/ts">source</a></footer>
   </div>
@@ -54,8 +54,7 @@ export default class Maze extends Vue {
       ascii: false,
       rows: 20,
       columns: 20,
-      cellSize: 10,
-      currentMaze: this.maze || new Grid(20, 20, 10) // required for initial draw
+      cellSize: 10
     };
   }
 
@@ -64,7 +63,6 @@ export default class Maze extends Vue {
     // this is causing that to flip out and add a zero on loss of focus after a change
     this.$data.cellSize += 1;
     this.$data.cellSize -= 1;
-    this.$data.currentMaze = this.maze;
   }
 
   // computed properties
@@ -87,7 +85,7 @@ export default class Maze extends Vue {
   }
 
   get mazeString(): string {
-    return this.$data.currentMaze.toString();
+    return this.maze.toString();
   }
 }
 </script>
