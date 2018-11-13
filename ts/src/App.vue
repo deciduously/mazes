@@ -1,6 +1,9 @@
 <template>
   <div id="app">
     <Maze title="Make some Mazes"/>
+    <footer>
+      <a href="https://github.com/deciduously/mazes/tree/master/ts">source</a>
+    </footer>
   </div>
 </template>
 

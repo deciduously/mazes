@@ -20,15 +20,15 @@
           <span>{{ columns }}</span>
           <input type="range" min="2" max="200" id="columns" v-model="columns">
           <label for="columns">Columns</label><br/>
-          <!-- broken until I fugure out how to force a redraw without tweaking any inputs
           <span>{{ cellSize }}</span>
           <input type="range" min="1" max="50" id="cellSize" v-model="cellSize">
-          <label for="cellSize">Cell Size</label> -->
+          <label for="cellSize">Cell Size</label><br/>
+          <input type="checkbox" id="square" v-model="square">
+          <label for="square">Square?</label>
         </fieldset>
       </form>
       <canvas v-draw-maze="maze"></canvas>
       <pre v-if="ascii">{{ mazeString }}</pre>
-    <footer><a href="https://github.com/deciduously/mazes/tree/master/ts">source</a></footer>
   </div>
 </template>
 
@@ -52,6 +52,7 @@ export default class Maze extends Vue {
     return {
       algo: "binarytree",
       ascii: false,
+      square: false,
       rows: 20,
       columns: 20,
       cellSize: 10
@@ -59,10 +60,10 @@ export default class Maze extends Vue {
   }
 
   private refreshMaze(): void {
-    // force a redraw by tweaking and untweaking cellSize by 1
-    // this is causing that to flip out and add a zero on loss of focus after a change
-    this.$data.cellSize += 1;
-    this.$data.cellSize -= 1;
+    // hacky but seems to work
+    const savedSize = this.$data.cellSize;
+    this.$data.cellSize = 1;
+    this.$data.cellSize = savedSize;
   }
 
   // computed properties
