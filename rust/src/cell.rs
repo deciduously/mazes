@@ -5,10 +5,10 @@ pub struct Cell<'a> {
   pub id: i32,
   pub row: i32,
   pub column: i32,
-  pub north: Option<i32>,
-  pub south: Option<i32>,
-  pub east: Option<i32>,
-  pub west: Option<i32>,
+  pub north: RefCell<Option<i32>>,
+  pub south: RefCell<Option<i32>>,
+  pub east: RefCell<Option<i32>>,
+  pub west: RefCell<Option<i32>>,
   pub links: RefCell<Vec<&'a Cell<'a>>>,
 }
 
@@ -28,10 +28,12 @@ impl<'a> Cell<'a> {
   }
 
   /// links self with target, optionally bidirectionally
-  pub fn link(&self, target: &'a Cell<'a>, bidi: bool) {
+  pub fn link<'b>(&self, target: &'a Cell<'b>, bidi: bool) {
     // we have a reference to the target
     // and are borrow_mut'ing
-    {self.links.borrow_mut().push(target);}
+    {
+      self.links.borrow_mut().push(target);
+    }
     if bidi {
       (*target).link(self, false);
     }

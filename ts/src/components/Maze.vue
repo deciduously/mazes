@@ -1,34 +1,37 @@
 <template>
   <div class="Maze">
-      <h1>{{ title }}</h1>
-      <button v-on:click="refreshMaze">New Maze</button>
-      <input type="checkbox" id="ascii" v-model="ascii">
-      <label for="checkbox">Render ASCII?</label>
-      <form v-on:change="refreshMaze">
-        <fieldset class="algo">
-            <legend>Algorithm</legend>
-            <input type="radio" class="radio-button" id="binarytree" value="binarytree"  v-model="algo">
-            <label for="binarytree">Binary Tree</label>
-            <input type="radio" class="radio-button" id="sidewinder" value="sidewinder"  v-model="algo">
-            <label for="sidewinder">Sidewinder</label>
-        </fieldset>
-        <fieldset>
-          <legend>Size</legend>
-          <span>{{ rows }}</span>
-          <input type="range" min="2" max="200" id="rows" v-model="rows">
-          <label for="rows">Rows</label><br/>
-          <span>{{ columns }}</span>
-          <input type="range" min="2" max="200" id="columns" v-model="columns">
-          <label for="columns">Columns</label><br/>
-          <span>{{ cellSize }}</span>
-          <input type="range" min="1" max="50" id="cellSize" v-model="cellSize">
-          <label for="cellSize">Cell Size</label><br/>
-          <input type="checkbox" id="square" v-model="square">
-          <label for="square">Square?</label>
-        </fieldset>
-      </form>
-      <canvas v-draw-maze="maze"></canvas>
-      <pre v-if="ascii">{{ mazeString }}</pre>
+    <h1>{{ title }}</h1>
+    <button v-on:click="refreshMaze">New Maze</button>
+    <input type="checkbox" id="ascii" v-model="ascii">
+    <label for="checkbox">Render ASCII?</label>
+    <form v-on:change="refreshMaze">
+      <fieldset class="algo">
+        <legend>Algorithm</legend>
+        <input type="radio" class="radio-button" id="binarytree" value="binarytree" v-model="algo">
+        <label for="binarytree">Binary Tree</label>
+        <input type="radio" class="radio-button" id="sidewinder" value="sidewinder" v-model="algo">
+        <label for="sidewinder">Sidewinder</label>
+      </fieldset>
+      <fieldset>
+        <legend>Size</legend>
+        <span>{{ rows }}</span>
+        <input type="range" min="2" max="200" id="rows" v-model="rows">
+        <label for="rows">Rows</label>
+        <br>
+        <span>{{ columns }}</span>
+        <input type="range" min="2" max="200" id="columns" v-model="columns">
+        <label for="columns">Columns</label>
+        <br>
+        <span>{{ cellSize }}</span>
+        <input type="range" min="1" max="50" id="cellSize" v-model="cellSize">
+        <label for="cellSize">Cell Size</label>
+        <br>
+        <!-- <input type="checkbox" id="square" v-model="square">
+        <label for="square">Square?</label>-->
+      </fieldset>
+    </form>
+    <canvas v-draw-maze="maze"></canvas>
+    <pre v-if="ascii">{{ mazeString }}</pre>
   </div>
 </template>
 

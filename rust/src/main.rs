@@ -9,6 +9,6 @@ use self::grid::{map_cells, Grid};
 
 fn main() {
     let empty = Grid::new(10, 10);
-    let bt = binary_tree::binary_tree(empty);
+    //let bt = binary_tree::binary_tree(empty);
     println!("{}", bt);
 }

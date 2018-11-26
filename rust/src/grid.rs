@@ -1,15 +1,15 @@
-use std::fmt;
+use std::{fmt, rc::Rc};
 
 use super::cell::Cell;
 
 #[derive(Clone, Debug)]
-pub struct Grid<'a> {
+pub struct Grid {
   pub rows: i32,
   pub columns: i32,
-  pub grid: Vec<Vec<Cell<'a>>>,
+  pub grid: Vec<Vec<Rc<Cell>>>,
 }
 
-impl<'a> Grid<'a> {
+impl Grid {
   pub fn new(rows: i32, columns: i32) -> Self {
     let ret = Self {
       rows,
@@ -19,7 +19,7 @@ impl<'a> Grid<'a> {
     configure_grid(&ret)
   }
 
-  pub fn cell_by_id(&'a self, id: i32) -> Option<&'a Cell> {
+  pub fn cell_by_id(&self, id: i32) -> Option<&Cell> {
     for row in self.grid.iter() {
       for cell in row.iter() {
         if cell.id == id {
@@ -30,19 +30,20 @@ impl<'a> Grid<'a> {
     None
   }
 
-  pub fn cell_by_id_mut(&'a mut self, id: i32) -> Option<&'a mut Cell> {
-    for row in self.grid.iter_mut() {
-      for cell in row.iter_mut() {
-        if cell.id == id {
-          return Some(&mut *cell);
-        }
-      }
-    }
-    None
-  }
+  // this is probably wrong
+  // pub fn cell_by_id_mut(&mut self, id: i32) -> Option<&'a mut Cell> {
+  //   for row in self.grid.iter_mut() {
+  //     for cell in row.iter_mut() {
+  //       if cell.id == id {
+  //         return Some(&mut *cell);
+  //       }
+  //     }
+  //   }
+  //   None
+  // }
 }
 
-impl<'a> fmt::Display for Grid<'a> {
+impl fmt::Display for Grid {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut ret = String::new();
 
@@ -94,9 +95,9 @@ impl<'a> fmt::Display for Grid<'a> {
 // so here we are
 
 // initializes a prepared grid with neighbors
-fn configure_grid<'a>(grid: &Grid<'a>) -> Grid<'a> {
+fn configure_grid(grid: &Grid) -> Grid {
   let mut ret = grid.clone();
-  map_cells(&mut ret, |cell: &mut Cell| {
+  map_cells(&mut ret, |cell: &Cell| {
     let row = cell.row;
     let col = cell.column;
 
