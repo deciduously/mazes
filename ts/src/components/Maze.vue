@@ -5,7 +5,7 @@
     <input type="checkbox" id="ascii" v-model="ascii">
     <label for="ascii">Render ASCII?</label>
     <input type="checkbox" id="distances" v-model="distances">
-    <label for="distances">Distance grid?</label>
+    <label for="distances">Render solved ASCII, NW to SW?</label>
     <form v-on:change="refreshMaze">
       <fieldset class="algo">
         <legend>Algorithm</legend>
@@ -87,7 +87,8 @@ export default class Maze extends Vue {
       );
       applyAlgorithm(g, this.$data.algo);
       const start = g.getCell(0, 0)!;
-      g.distances = start.distances();
+      const distances = start.distances();
+      g.distances = distances.pathTo(g.getCell(g.rows - 1, 0)!);
     }
 
     return g;
