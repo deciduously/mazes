@@ -3,7 +3,9 @@
     <h1>{{ title }}</h1>
     <button v-on:click="refreshMaze">New Maze</button>
     <input type="checkbox" id="ascii" v-model="ascii">
-    <label for="checkbox">Render ASCII?</label>
+    <label for="ascii">Render ASCII?</label>
+    <input type="checkbox" id="distances" v-model="distances">
+    <label for="distances">Distance grid?</label>
     <form v-on:change="refreshMaze">
       <fieldset class="algo">
         <legend>Algorithm</legend>
@@ -37,8 +39,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Grid from "@/maze/grid";
-import { binaryTree, sidewinder } from "@/maze/algo";
+import DistanceGrid from "@/maze/distanceGrid";
+import Grid, { applyAlgorithm } from "@/maze/grid";
 
 @Component({
   directives: {
@@ -55,6 +57,7 @@ export default class Maze extends Vue {
     return {
       algo: "binarytree",
       ascii: false,
+      distances: false,
       square: false,
       rows: 20,
       columns: 20,
@@ -72,19 +75,21 @@ export default class Maze extends Vue {
   // computed properties
 
   get maze(): Grid {
-    const g = new Grid(
-      this.$data.rows,
-      this.$data.columns,
-      this.$data.cellSize
-    );
-    switch (this.$data.algo) {
-      case "sidewinder":
-        sidewinder(g);
-        break;
-      case "binarytree":
-      default:
-        binaryTree(g);
+    let g;
+    if (!this.$data.distances) {
+      g = new Grid(this.$data.rows, this.$data.columns, this.$data.cellSize);
+      applyAlgorithm(g, this.$data.algo);
+    } else {
+      g = new DistanceGrid(
+        this.$data.rows,
+        this.$data.columns,
+        this.$data.cellSize
+      );
+      applyAlgorithm(g, this.$data.algo);
+      const start = g.getCell(0, 0)!;
+      g.distances = start.distances();
     }
+
     return g;
   }
 

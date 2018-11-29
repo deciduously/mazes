@@ -2,9 +2,9 @@ import Cell from './cell';
 
 export default class Distances {
     private cells: Map<Cell, number>;
-    constructor(root: Cell) {
+    constructor(private readonly root: Cell) {
         this.cells = new Map();
-        this.cells.set(root, 0);
+        this.set(root, 0);
     }
 
     public get(c: Cell): number | undefined {

@@ -1,8 +1,9 @@
 import Cell from './cell';
+import { binaryTree, sidewinder } from '@/maze/algo';
 
 // To approximate img.line() from chunky_png in Ruby
 const drawLine = (
-  x1: number, y1: number, x2: number, y2: number, ctx: CanvasRenderingContext2D) => {
+  x1: number, y1: number, x2: number, y2: number, ctx: CanvasRenderingContext2D): void => {
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
@@ -11,13 +12,24 @@ const drawLine = (
   ctx.stroke();
 };
 
+export const applyAlgorithm = (g: Grid, algo: string): void => {
+  switch (algo) {
+    case 'sidewinder':
+      sidewinder(g);
+      break;
+    case 'binarytree':
+    default:
+      binaryTree(g);
+  }
+};
+
 export default class Grid {
   public readonly canvasW: number;
   public readonly canvasH: number;
   private grid: Cell[][];
   constructor(
-    private readonly rows: number,
-    private readonly columns: number,
+    public readonly rows: number,
+    public readonly columns: number,
     public readonly cellSize: number) {
     // set up canvas
     this.canvasW = (columns * cellSize) + 1;
@@ -71,6 +83,16 @@ export default class Grid {
     });
   }
 
+  public contentsOf(c: Cell): string {
+    return ' ';
+  }
+
+  public getCell = (row: number, col: number): Cell | null => {
+    if (row < 0 || row >= this.rows) { return null; }
+    if (col < 0 || col >= this.columns) { return null; }
+    return this.grid[row][col];
+  }
+
   public toString = (): string => {
     let output = '+';
     for (let i = 0; i < this.columns; i += 1) {
@@ -82,7 +104,7 @@ export default class Grid {
       let bottom = '+';
 
       row.forEach((cell) => {
-        const body = ` ${cell.contents()} `;
+        const body = ` ${this.contentsOf(cell)} `;
         const eastBoundary = (cell.isLinked(cell.east) ? ' ' : '|');
         top += body;
         top += eastBoundary;
@@ -111,12 +133,6 @@ export default class Grid {
       cell.west = this.getCell(row, col - 1);
       cell.east = this.getCell(row, col + 1);
     });
-  }
-
-  private getCell = (row: number, col: number): Cell | null => {
-    if (row < 0 || row >= this.rows) { return null; }
-    if (col < 0 || col >= this.columns) { return null; }
-    return this.grid[row][col];
   }
 
   private prepareGrid = () => {

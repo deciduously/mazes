@@ -14,13 +14,15 @@ export default class Cell {
     this.links = new Map();
   }
 
-  public contents = () => ' ';
-
   public link(cell: Cell, bidi = true) {
     this.links.set(cell, true);
     if (bidi) {
       cell.link(this, false);
     }
+  }
+
+  public getLinks(): Cell[] {
+    return Array.from(this.links.keys());
   }
 
   public isLinked = (cell: Cell | null): boolean => {
@@ -36,22 +38,23 @@ export default class Cell {
   }
 
   public distances(): Distances {
-    let distances = new Distances(this);
+    const distances = new Distances(this);
     let frontier: Cell[] = [this];
 
     while (frontier.length > 0) {
-      let new_frontier: Cell[] = [];
+      const newFrontier: Cell[] = [];
 
-      for (const c in frontier) {
-        for (const linked in c.links()) {
+      for (const c of frontier) {
+        for (const linked of c.getLinks()) {
           if (distances.get(linked) !== undefined) {
             continue;
+          } else {
+            distances.set(linked, distances.get(c)! + 1);
+            newFrontier.push(linked);
           }
-          distances.set(linked, distances.get(cell)!);
-          new_frontier.push(linked);
         }
       }
-      frontier = new_frontier;
+      frontier = newFrontier;
     }
     return distances;
   }
