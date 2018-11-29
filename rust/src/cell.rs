@@ -18,17 +18,17 @@ impl<'a> Cell<'a> {
       id,
       row,
       column,
-      north: None,
-      south: None,
-      east: None,
-      west: None,
+      north: RefCell::new(None),
+      south: RefCell::new(None),
+      east: RefCell::new(None),
+      west: RefCell::new(None),
       // Ruby is using a hashmap - I'm not sure why I can't just use a Vec
       links: RefCell::new(Vec::new()),
     }
   }
 
   /// links self with target, optionally bidirectionally
-  pub fn link<'b>(&self, target: &'a Cell<'b>, bidi: bool) {
+  pub fn link(&self, target: &'a Cell<'a>, bidi: bool) {
     // we have a reference to the target
     // and are borrow_mut'ing
     {
@@ -39,23 +39,23 @@ impl<'a> Cell<'a> {
     }
   }
 
-  ///linked is a predicate testing whether Cell is linked to target
-  pub fn linked(&self, target: Option<i32>) -> bool {
-    //match target {
-    //  Some(x) => {
-    //    for link in &self.links {
-    //      match link {
-    //        Some(y) => {
-    //          if x == *y {
-    //            return true;
-    //          }
-    //        }
-    //        None => {}
-    //      }
-    //    }
-    //    false
-    //  }
-    //  None => false,
-    //}
-  }
+  // linked is a predicate testing whether Cell is linked to target
+  //pub fn linked(&self, target: Option<i32>) -> bool {
+  //match target {
+  //  Some(x) => {
+  //    for link in &self.links {
+  //      match link {
+  //        Some(y) => {
+  //          if x == *y {
+  //            return true;
+  //          }
+  //        }
+  //        None => {}
+  //      }
+  //    }
+  //    false
+  //  }
+  //  None => false,
+  //}
+  //}
 }

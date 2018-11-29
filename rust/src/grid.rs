@@ -1,15 +1,15 @@
-use std::{fmt, rc::Rc};
+use std::{cell::RefCell, fmt, rc::Rc};
 
 use super::cell::Cell;
 
 #[derive(Clone, Debug)]
-pub struct Grid {
+pub struct Grid<'a> {
   pub rows: i32,
   pub columns: i32,
-  pub grid: Vec<Vec<Rc<Cell>>>,
+  pub grid: Vec<Vec<Rc<Cell<'a>>>>,
 }
 
-impl Grid {
+impl<'a> Grid<'a> {
   pub fn new(rows: i32, columns: i32) -> Self {
     let ret = Self {
       rows,
@@ -19,7 +19,7 @@ impl Grid {
     configure_grid(&ret)
   }
 
-  pub fn cell_by_id(&self, id: i32) -> Option<&Cell> {
+  pub fn cell_by_id(&self, id: i32) -> Option<&'a Cell> {
     for row in self.grid.iter() {
       for cell in row.iter() {
         if cell.id == id {
@@ -43,7 +43,7 @@ impl Grid {
   // }
 }
 
-impl fmt::Display for Grid {
+impl<'a> fmt::Display for Grid<'a> {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut ret = String::new();
 
@@ -95,16 +95,16 @@ impl fmt::Display for Grid {
 // so here we are
 
 // initializes a prepared grid with neighbors
-fn configure_grid(grid: &Grid) -> Grid {
+fn configure_grid<'a>(grid: &Grid) -> Grid<'a> {
   let mut ret = grid.clone();
   map_cells(&mut ret, |cell: &Cell| {
     let row = cell.row;
     let col = cell.column;
 
-    cell.north = get(&grid, row - 1, col);
-    cell.south = get(&grid, row + 1, col);
-    cell.west = get(&grid, row, col - 1);
-    cell.east = get(&grid, row, col + 1);
+    cell.north = RefCell::new(get(&grid, row - 1, col));
+    cell.south = RefCell::new(get(&grid, row + 1, col));
+    cell.west = RefCell::new(get(&grid, row, col - 1));
+    cell.east = RefCell::new(get(&grid, row, col + 1));
   });
   ret
 }
@@ -142,13 +142,13 @@ where
 }
 
 /// returns a Vec<Vec<Cell>> of the given dimensions
-fn prepare_grid<'a>(rows: i32, columns: i32) -> Vec<Vec<Cell<'a>>> {
+fn prepare_grid<'a>(rows: i32, columns: i32) -> Vec<Vec<Rc<Cell<'a>>>> {
   let mut ret = Vec::new();
   let mut current_id = 0;
   for i in 0..rows {
     let mut row = Vec::new();
     for j in 0..columns {
-      row.push(Cell::new(current_id, i, j));
+      row.push(Rc::new(Cell::new(current_id, i, j)));
       current_id += 1;
     }
     ret.push(row);
