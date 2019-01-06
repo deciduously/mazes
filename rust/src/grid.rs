@@ -124,7 +124,7 @@ fn get(grid: &Grid, row: i32, column: i32) -> Option<i32> {
 }
 
 /// takes a function to perform on each row, immutable cells
-fn map_rows<F>(grid: &mut Grid, mut step: F)
+pub fn map_rows<F>(grid: &mut Grid, mut step: F)
 where
     F: FnMut(&[Cell]),
 {
