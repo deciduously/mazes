@@ -19,9 +19,9 @@ impl Grid {
         configure_grid(&ret)
     }
 
-    pub fn cell_by_id(&self, id: i32) -> Option<&Cell> {
-        for row in self.grid.iter() {
-            for cell in row.iter() {
+    pub fn cell_by_id_mut(&mut self, id: i32) -> Option<&mut Cell> {
+        for row in self.grid.iter_mut() {
+            for cell in row.iter_mut() {
                 if cell.id == id {
                     return Some(cell);
                 }
@@ -32,19 +32,18 @@ impl Grid {
 
     // This exists as a method on Cell in the Ruby and in my TypeScript
     // Rust was having none of that nonsense and I got mired in lifetime hell
+    // Much easier to just elevate it to the grid level
     /// Links the two cells specified
     pub fn link(&mut self, origin: i32, target: i32) {
         // add target to origin
-        self.cell_by_id(origin)
+        self.cell_by_id_mut(origin)
             .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
             .links
-            .borrow_mut()
             .push(target);
         // add origin to target
-        self.cell_by_id(target)
+        self.cell_by_id_mut(target)
             .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
             .links
-            .borrow_mut()
             .push(origin);
     }
 }
@@ -71,13 +70,13 @@ impl<'a> fmt::Display for Grid {
 
             for cell in row {
                 top.push_str("   ");
-                if cell.linked(cell.east.clone().into_inner()) {
+                if cell.linked(cell.east) {
                     top.push_str(" ");
                 } else {
                     top.push_str("|");
                 }
 
-                if cell.linked(cell.south.clone().into_inner()) {
+                if cell.linked(cell.south) {
                     bottom.push_str("   ");
                 } else {
                     bottom.push_str("---");
@@ -97,20 +96,19 @@ impl<'a> fmt::Display for Grid {
 
 // in Ruby, these were methods on grid
 // I think this is going to eventually be a trait
-// it sounds like it would need to be swappable, and I had borrowchecker problems
-// so here we are
+// it sounds like it would need to be swappable
 
 // initializes a prepared grid with neighbors
 fn configure_grid(grid: &Grid) -> Grid {
     let mut ret = grid.clone();
-    map_cells(&mut ret, |cell: &mut Cell| {
+    map_cells_mut(&mut ret, |cell: &mut Cell| {
         let row = cell.row;
         let col = cell.column;
 
-        cell.north.replace(get(&grid, row - 1, col));
-        cell.south.replace(get(&grid, row + 1, col));
-        cell.west.replace(get(&grid, row, col - 1));
-        cell.east.replace(get(&grid, row, col + 1));
+        cell.north = get(&grid, row - 1, col);
+        cell.south = get(&grid, row + 1, col);
+        cell.west = get(&grid, row, col - 1);
+        cell.east = get(&grid, row, col + 1);
     });
     ret
 }
@@ -125,23 +123,45 @@ fn get(grid: &Grid, row: i32, column: i32) -> Option<i32> {
     }
 }
 
-/// takes a function to perform on each row
+/// takes a function to perform on each row, immutable cells
 fn map_rows<F>(grid: &mut Grid, mut step: F)
 where
-    F: FnMut(&mut Vec<Cell>),
+    F: FnMut(&[Cell]),
 {
     for row in &mut grid.grid {
         step(row);
     }
 }
 
-/// takes a function to perform on each cell
+/// takes a function to perform on each cell, immutable cells
 pub fn map_cells<F>(grid: &mut Grid, mut step: F)
 where
-    F: FnMut(&mut Cell),
+    F: FnMut(&Cell),
 {
     map_rows(grid, |row| {
         for cell in row {
+            step(cell);
+        }
+    });
+}
+
+/// takes a function to perform on each row, mutable cells
+fn map_rows_mut<F>(grid: &mut Grid, mut step: F)
+where
+    F: FnMut(&mut [Cell]),
+{
+    for row in &mut grid.grid {
+        step(row);
+    }
+}
+
+/// takes a function to perform on each cell, mutable cells
+pub fn map_cells_mut<F>(grid: &mut Grid, mut step: F)
+where
+    F: FnMut(&mut Cell),
+{
+    map_rows_mut(grid, |row| {
+        for cell in row.iter_mut() {
             step(cell);
         }
     });
