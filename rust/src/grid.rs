@@ -4,97 +4,95 @@ use crate::cell::Cell;
 
 #[derive(Clone, Debug)]
 pub struct Grid {
-  pub rows: i32,
-  pub columns: i32,
-  pub grid: Vec<Vec<Cell>>,
+    pub rows: i32,
+    pub columns: i32,
+    pub grid: Vec<Vec<Cell>>,
 }
 
 impl Grid {
-  pub fn new(rows: i32, columns: i32) -> Self {
-    let ret = Self {
-      rows,
-      columns,
-      grid: prepare_grid(rows, columns),
-    };
-    configure_grid(&ret)
-  }
-
-  pub fn cell_by_id(&self, id: i32) -> Option<&Cell> {
-    for row in self.grid.iter() {
-      for cell in row.iter() {
-        if cell.id == id {
-          return Some(cell);
-        }
-      }
+    pub fn new(rows: i32, columns: i32) -> Self {
+        let ret = Self {
+            rows,
+            columns,
+            grid: prepare_grid(rows, columns),
+        };
+        configure_grid(&ret)
     }
-    None
-  }
 
-  // This exists as a method on Cell in the Ruby and in my TypeScript
-  // Rust was having none of that nonsense and I got mired in lifetime hell
-  /// Links the two cells specified
-  pub fn link(&mut self, origin: i32, target: i32) {
-    // add target to origin
-    self
-      .cell_by_id(origin)
-      .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
-      .links
-      .borrow_mut()
-      .push(target);
-    // add origin to target
-    self
-      .cell_by_id(target)
-      .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
-      .links
-      .borrow_mut()
-      .push(origin);
-  }
+    pub fn cell_by_id(&self, id: i32) -> Option<&Cell> {
+        for row in self.grid.iter() {
+            for cell in row.iter() {
+                if cell.id == id {
+                    return Some(cell);
+                }
+            }
+        }
+        None
+    }
+
+    // This exists as a method on Cell in the Ruby and in my TypeScript
+    // Rust was having none of that nonsense and I got mired in lifetime hell
+    /// Links the two cells specified
+    pub fn link(&mut self, origin: i32, target: i32) {
+        // add target to origin
+        self.cell_by_id(origin)
+            .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
+            .links
+            .borrow_mut()
+            .push(target);
+        // add origin to target
+        self.cell_by_id(target)
+            .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
+            .links
+            .borrow_mut()
+            .push(origin);
+    }
 }
 
 impl<'a> fmt::Display for Grid {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut ret = String::new();
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut ret = String::new();
 
-    // print top row
-    ret.push_str("+");
-    for _ in 0..self.columns {
-      ret.push_str("---+")
-    }
-    ret.push_str("\n");
+        // print top row
+        ret.push_str("+");
+        for _ in 0..self.columns {
+            ret.push_str("---+")
+        }
+        ret.push_str("\n");
 
-    // print each row - each grid row has 2 lines of text to print
-    // "top" is our vertical walls "|"
-    // "bottom" is our horizontal walls "---"
-    for row in &self.grid {
-      let mut top = String::new();
-      top.push_str("|");
-      let mut bottom = String::new();
-      bottom.push_str("+");
+        // print each row - each grid row has 2 lines of text to print
+        // "top" is our vertical walls "|"
+        // "bottom" is our horizontal walls "---"
+        for row in &self.grid {
+            let mut top = String::new();
+            top.push_str("|");
+            let mut bottom = String::new();
+            bottom.push_str("+");
 
-      for cell in row {
-        top.push_str("   ");
-        if cell.linked(cell.east.clone().into_inner()) {
-          top.push_str(" ");
-        } else {
-          top.push_str("|");
+            for cell in row {
+                top.push_str("   ");
+                if cell.linked(cell.east.clone().into_inner()) {
+                    top.push_str(" ");
+                } else {
+                    top.push_str("|");
+                }
+
+                if cell.linked(cell.south.clone().into_inner()) {
+                    bottom.push_str("   ");
+                } else {
+                    bottom.push_str("---");
+                }
+                bottom.push_str("+");
+            }
+
+            ret.push_str(&top);
+            ret.push_str("\n");
+            ret.push_str(&bottom);
+            ret.push_str("\n");
         }
 
-        if cell.linked(cell.south.clone().into_inner()) {
-          bottom.push_str("   ");
-        } else {
-          bottom.push_str("---");
-        }
-        bottom.push_str("+");
-      }
-
-      ret.push_str(&top);
-      ret.push_str("\n");
-      ret.push_str(&bottom);
-      ret.push_str("\n");
+        write!(f, "{}", ret)
     }
-
-    write!(f, "{}", ret)
-  }
 }
 
 // in Ruby, these were methods on grid
@@ -103,63 +101,63 @@ impl<'a> fmt::Display for Grid {
 // so here we are
 
 // initializes a prepared grid with neighbors
-fn configure_grid<'a>(grid: &Grid) -> Grid {
-  let mut ret = grid.clone();
-  map_cells(&mut ret, |cell: &mut Cell| {
-    let row = cell.row;
-    let col = cell.column;
+fn configure_grid(grid: &Grid) -> Grid {
+    let mut ret = grid.clone();
+    map_cells(&mut ret, |cell: &mut Cell| {
+        let row = cell.row;
+        let col = cell.column;
 
-    cell.north.replace(get(&grid, row - 1, col));
-    cell.south.replace(get(&grid, row + 1, col));
-    cell.west.replace(get(&grid, row, col - 1));
-    cell.east.replace(get(&grid, row, col + 1));
-  });
-  ret
+        cell.north.replace(get(&grid, row - 1, col));
+        cell.south.replace(get(&grid, row + 1, col));
+        cell.west.replace(get(&grid, row, col - 1));
+        cell.east.replace(get(&grid, row, col + 1));
+    });
+    ret
 }
 
 // instead of overloading []
 /// Performs bounds-checking lookup on a &Grid
 fn get(grid: &Grid, row: i32, column: i32) -> Option<i32> {
-  if (row < 0 || row > grid.rows - 1) || (column < 0 || column > grid.columns - 1) {
-    None
-  } else {
-    Some(grid.grid[row as usize][column as usize].id)
-  }
+    if (row < 0 || row > grid.rows - 1) || (column < 0 || column > grid.columns - 1) {
+        None
+    } else {
+        Some(grid.grid[row as usize][column as usize].id)
+    }
 }
 
 /// takes a function to perform on each row
 fn map_rows<F>(grid: &mut Grid, mut step: F)
 where
-  F: FnMut(&mut Vec<Cell>),
+    F: FnMut(&mut Vec<Cell>),
 {
-  for row in &mut grid.grid {
-    step(row);
-  }
+    for row in &mut grid.grid {
+        step(row);
+    }
 }
 
 /// takes a function to perform on each cell
 pub fn map_cells<F>(grid: &mut Grid, mut step: F)
 where
-  F: FnMut(&mut Cell),
+    F: FnMut(&mut Cell),
 {
-  map_rows(grid, |row| {
-    for cell in row {
-      step(cell);
-    }
-  });
+    map_rows(grid, |row| {
+        for cell in row {
+            step(cell);
+        }
+    });
 }
 
 /// returns a Vec<Vec<Cell>> of the given dimensions
 fn prepare_grid(rows: i32, columns: i32) -> Vec<Vec<Cell>> {
-  let mut ret = Vec::new();
-  let mut current_id = 0;
-  for i in 0..rows {
-    let mut row = Vec::new();
-    for j in 0..columns {
-      row.push(Cell::new(current_id, i, j));
-      current_id += 1;
+    let mut ret = Vec::new();
+    let mut current_id = 0;
+    for i in 0..rows {
+        let mut row = Vec::new();
+        for j in 0..columns {
+            row.push(Cell::new(current_id, i, j));
+            current_id += 1;
+        }
+        ret.push(row);
     }
-    ret.push(row);
-  }
-  ret
+    ret
 }
