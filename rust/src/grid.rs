@@ -1,12 +1,12 @@
-use std::{fmt, rc::Rc};
+use std::fmt;
 
-use super::cell::Cell;
+use crate::cell::Cell;
 
 #[derive(Clone, Debug)]
 pub struct Grid {
   pub rows: i32,
   pub columns: i32,
-  pub grid: Vec<Vec<Rc<Cell>>>,
+  pub grid: Vec<Vec<Cell>>,
 }
 
 impl Grid {
@@ -30,17 +30,25 @@ impl Grid {
     None
   }
 
-  // this is probably wrong
-  // pub fn cell_by_id_mut(&mut self, id: i32) -> Option<&'a mut Cell> {
-  //   for row in self.grid.iter_mut() {
-  //     for cell in row.iter_mut() {
-  //       if cell.id == id {
-  //         return Some(&mut *cell);
-  //       }
-  //     }
-  //   }
-  //   None
-  // }
+  // This exists as a method on Cell in the Ruby and in my TypeScript
+  // Rust was having none of that nonsense and I got mired in lifetime hell
+  /// Links the two cells specified
+  pub fn link(&mut self, origin: i32, target: i32) {
+    // add target to origin
+    self
+      .cell_by_id(origin)
+      .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
+      .links
+      .borrow_mut()
+      .push(target);
+    // add origin to target
+    self
+      .cell_by_id(target)
+      .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
+      .links
+      .borrow_mut()
+      .push(origin);
+  }
 }
 
 impl fmt::Display for Grid {
@@ -65,13 +73,13 @@ impl fmt::Display for Grid {
 
       for cell in row {
         top.push_str("   ");
-        if (*cell).linked(cell.east) {
+        if cell.linked(cell.east.clone().into_inner()) {
           top.push_str(" ");
         } else {
           top.push_str("|");
         }
 
-        if cell.linked(cell.south) {
+        if cell.linked(cell.south.clone().into_inner()) {
           bottom.push_str("   ");
         } else {
           bottom.push_str("---");
@@ -97,14 +105,14 @@ impl fmt::Display for Grid {
 // initializes a prepared grid with neighbors
 fn configure_grid(grid: &Grid) -> Grid {
   let mut ret = grid.clone();
-  map_cells(&mut ret, |cell: &Cell| {
+  map_cells(&mut ret, |cell: &mut Cell| {
     let row = cell.row;
     let col = cell.column;
 
-    cell.north = get(&grid, row - 1, col);
-    cell.south = get(&grid, row + 1, col);
-    cell.west = get(&grid, row, col - 1);
-    cell.east = get(&grid, row, col + 1);
+    cell.north.replace(get(&grid, row - 1, col));
+    cell.south.replace(get(&grid, row + 1, col));
+    cell.west.replace(get(&grid, row, col - 1));
+    cell.east.replace(get(&grid, row, col + 1));
   });
   ret
 }
@@ -142,7 +150,7 @@ where
 }
 
 /// returns a Vec<Vec<Cell>> of the given dimensions
-fn prepare_grid<'a>(rows: i32, columns: i32) -> Vec<Vec<Cell<'a>>> {
+fn prepare_grid(rows: i32, columns: i32) -> Vec<Vec<Cell>> {
   let mut ret = Vec::new();
   let mut current_id = 0;
   for i in 0..rows {
