@@ -23,7 +23,7 @@ impl Grid {
     for row in self.grid.iter() {
       for cell in row.iter() {
         if cell.id == id {
-          return Some(&*cell);
+          return Some(cell);
         }
       }
     }
@@ -51,7 +51,7 @@ impl Grid {
   }
 }
 
-impl fmt::Display for Grid {
+impl<'a> fmt::Display for Grid {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut ret = String::new();
 
@@ -103,7 +103,7 @@ impl fmt::Display for Grid {
 // so here we are
 
 // initializes a prepared grid with neighbors
-fn configure_grid(grid: &Grid) -> Grid {
+fn configure_grid<'a>(grid: &Grid) -> Grid {
   let mut ret = grid.clone();
   map_cells(&mut ret, |cell: &mut Cell| {
     let row = cell.row;
