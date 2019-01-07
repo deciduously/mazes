@@ -1,3 +1,5 @@
+extern crate image;
+extern crate imageproc;
 extern crate rand;
 
 mod algo;
@@ -12,9 +14,17 @@ use self::{
 fn main() {
     let args: Vec<String> = ::std::env::args().collect();
     let algo = if args.len() > 1 { &args[1] } else { "bt" };
-    let empty = Grid::new(10, 10);
+    let mut grid = Grid::new(10, 10);
     match algo {
-        "s" | "sidewinder" => println!("Sidewinder\n{}", sidewinder(empty)),
-        "bt" | _ => println!("Binary Tree\n{}", binary_tree(empty)),
+        "s" | "sidewinder" => {
+            grid = sidewinder(&grid);
+            println!("Sidewinder:")
+        }
+        "bt" | _ => {
+            grid = binary_tree(&grid);
+            println!("Binary Tree:")
+        }
     }
+    println!("{}", grid);
+    grid.to_img(None);
 }

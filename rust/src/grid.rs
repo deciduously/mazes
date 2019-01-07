@@ -1,6 +1,8 @@
 use std::fmt;
 
 use crate::cell::Cell;
+use image::{Rgb, RgbImage};
+use imageproc::drawing::draw_line_segment_mut;
 
 #[derive(Clone, Debug)]
 pub struct Grid {
@@ -45,6 +47,44 @@ impl Grid {
             .unwrap_or_else(|| panic!("Tried to link nonexisting cell"))
             .links
             .push(origin);
+    }
+
+    // saves an image of your maze, default cell size of 10
+    pub fn to_img(&self, cell_size_param: Option<i32>) {
+        let cell_size = cell_size_param.unwrap_or(10);
+        let img_width = cell_size * self.columns;
+        let img_height = cell_size * self.rows;
+        let bg_color = Rgb([255, 255, 255]); // white background - unused?
+        let wall_color = Rgb([0, 0, 0]);
+
+        let mut imgbuf = RgbImage::new((img_width + 1) as u32, (img_height + 1) as u32);
+
+        // set all pixels to white
+        for (_, _, px) in imgbuf.enumerate_pixels_mut() {
+            *px = bg_color;
+        }
+
+        map_cells(self, |cell| {
+            let x1 = (cell.column * cell_size) as f32;
+            let y1 = (cell.row * cell_size) as f32;
+            let x2 = ((cell.column + 1) * cell_size) as f32;
+            let y2 = ((cell.row + 1) * cell_size) as f32;
+
+            if cell.north.is_none() {
+                draw_line_segment_mut(&mut imgbuf, (x1, y1), (x2, y1), wall_color)
+            }
+            if cell.west.is_none() {
+                draw_line_segment_mut(&mut imgbuf, (x1, y1), (x1, y2), wall_color)
+            }
+            if !cell.linked(cell.east) {
+                draw_line_segment_mut(&mut imgbuf, (x2, y1), (x2, y2), wall_color)
+            }
+            if !cell.linked(cell.south) {
+                draw_line_segment_mut(&mut imgbuf, (x1, y2), (x2, y2), wall_color)
+            }
+        });
+
+        imgbuf.save("maze.png").unwrap();
     }
 }
 
@@ -124,17 +164,17 @@ fn get(grid: &Grid, row: i32, column: i32) -> Option<i32> {
 }
 
 /// takes a function to perform on each row, immutable cells
-pub fn map_rows<F>(grid: &mut Grid, mut step: F)
+pub fn map_rows<F>(grid: &Grid, mut step: F)
 where
     F: FnMut(&[Cell]),
 {
-    for row in &mut grid.grid {
+    for row in &grid.grid {
         step(row);
     }
 }
 
 /// takes a function to perform on each cell, immutable cells
-pub fn map_cells<F>(grid: &mut Grid, mut step: F)
+pub fn map_cells<F>(grid: &Grid, mut step: F)
 where
     F: FnMut(&Cell),
 {

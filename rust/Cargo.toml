@@ -4,4 +4,6 @@ edition = "2018"
 name = "mazes"
 version = "0.1.0"
 [dependencies]
-rand = "0.5"
+image = "0.20"
+imageproc = "0.17"
+rand = "0.6"

@@ -1,4 +1,4 @@
-use rand::{thread_rng, Rng};
+use rand::{seq::SliceRandom, thread_rng, Rng};
 
 use crate::{
     cell::Cell,
@@ -8,10 +8,10 @@ use crate::{
 // The BinaryTree algorithm walks through each cell
 // In each, it randomly links either the cell to the north or the cell to the east if available
 
-pub fn binary_tree(mut grid: Grid) -> Grid {
+pub fn binary_tree(grid: &Grid) -> Grid {
     let mut rng = thread_rng();
     let mut ret = Grid::new(grid.rows, grid.columns);
-    map_cells(&mut grid, |cell: &Cell| {
+    map_cells(&grid, |cell: &Cell| {
         // Grab possible links
         let mut neighbors = Vec::new();
         if let Some(id) = cell.north {
@@ -22,7 +22,7 @@ pub fn binary_tree(mut grid: Grid) -> Grid {
         }
 
         // Link one of them
-        if let Some(id) = rng.choose(&neighbors) {
+        if let Some(id) = neighbors.choose(&mut rng) {
             ret.link(cell.id, *id)
         }
     });
@@ -35,17 +35,17 @@ pub fn binary_tree(mut grid: Grid) -> Grid {
 // To close the run, we randomly link one of the run to the north if there's a row above us
 // It then clears out the stored cells we've seen and continues through the row
 
-pub fn sidewinder(mut grid: Grid) -> Grid {
+pub fn sidewinder(grid: &Grid) -> Grid {
     let mut rng = thread_rng();
     let mut ret = Grid::new(grid.rows, grid.columns);
-    map_rows(&mut grid, |row: &[Cell]| {
+    map_rows(&grid, |row: &[Cell]| {
         let mut run = Vec::new();
         for cell in row {
             run.push(cell);
 
             if cell.east.is_none() || (cell.north.is_some() && rng.gen_range(0, 2) == 0) {
                 // ending the run, randomly link one of the run north
-                let lucky_winner = rng.choose(&run).unwrap();
+                let lucky_winner = run.choose(&mut rng).unwrap();
                 if let Some(north_id) = lucky_winner.north {
                     ret.link(lucky_winner.id, north_id)
                 }
