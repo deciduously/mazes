@@ -4,6 +4,10 @@ use crate::cell::Cell;
 use image::{Rgb, RgbImage};
 use imageproc::drawing::draw_line_segment_mut;
 
+//trait Maze {
+//
+//}
+
 #[derive(Clone, Debug)]
 pub struct Grid {
     pub rows: i32,
@@ -54,7 +58,7 @@ impl Grid {
         let cell_size = cell_size_param.unwrap_or(10);
         let img_width = cell_size * self.columns;
         let img_height = cell_size * self.rows;
-        let bg_color = Rgb([255, 255, 255]); // white background - unused?
+        let bg_color = Rgb([255, 255, 255]);
         let wall_color = Rgb([0, 0, 0]);
 
         let mut imgbuf = RgbImage::new((img_width + 1) as u32, (img_height + 1) as u32);
